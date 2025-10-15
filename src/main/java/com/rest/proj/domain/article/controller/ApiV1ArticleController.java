@@ -27,10 +27,14 @@ public class ApiV1ArticleController {
     }
 
     @GetMapping("/{id}")
-    public Article getArticle(@PathVariable("id") Long id){
-
-        Article article = articleService.getArticle(id);
-
-        return article;
+    public RsData<Article> getArticle(@PathVariable("id") Long id){
+        //map 명령어는 Optional 데이터만 처리한다
+        return articleService.getArticle(id).map(article -> RsData.of(
+                "S-1",
+                "성공",
+                article)).orElseGet(()-> RsData.of(
+                        "F-1",
+                "%d번 게시물은 존재하지 않습니다.".formatted(id),
+                null));
     }
 }
