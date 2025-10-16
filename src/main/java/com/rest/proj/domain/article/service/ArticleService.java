@@ -2,6 +2,8 @@ package com.rest.proj.domain.article.service;
 
 import com.rest.proj.domain.article.entity.Article;
 import com.rest.proj.domain.article.repository.ArticleRepository;
+import com.rest.proj.global.rsData.RsData;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +16,19 @@ public class ArticleService {
 
     private final ArticleRepository articleRepository;
 
-    public void create(String subject, String content){
+    /*한 세트로 처리되는 작업의 묶음*/
+    /*음식점으로 비유를 하자면*/
+    /*손님이 앱으로 주문을 시작했는데 중간에 취소를 하면 모든 작업이 취소가 된다*/
+    /*이 취소되는 작업덩어리를 트랜젝션이라한다*/
+    /*@Transactional 을 선언하면 다음 동작을 1개의 작업이라고 알려주는 것이다*/
+    @Transactional
+    public RsData<Article> create(String subject, String content){
         Article article = Article.builder()
                 .subject(subject)
                 .content(content)
                 .build();
         articleRepository.save(article);
+        return RsData.of("S-2", "신규게시물이 생성되었습니다.", article);
     }
 
     public List<Article> getList() {
