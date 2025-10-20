@@ -117,4 +117,36 @@ public class ApiV1ArticleController {
 
     }
 
+    @Data
+    public static class DeleteRequest {
+        @NotBlank
+        private String subject;
+
+        @NotBlank
+        private String content;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class DeleteResponse {
+        private final Article article;
+    }
+
+    @DeleteMapping("/{id}")
+    public RsData delete(@PathVariable("id") Long id){
+        Optional<Article> opArticle = articleService.findById(id);
+
+        if(opArticle.isEmpty()) return RsData.of(
+                "F-1",
+                "%d번 게시물은 존재하지 않습니다.".formatted(id)
+        );
+
+        RsData<Article> deleteRs = articleService.delete(id);
+
+        return RsData.of(
+                deleteRs.getResultCode(),
+                deleteRs.getMsg(),
+                new DeleteResponse(deleteRs.getData())
+        );
+    }
 }
