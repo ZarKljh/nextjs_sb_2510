@@ -78,7 +78,7 @@ function ArticleForm({ fetchArticles }) {
       alert("success");
       //새로고침을 하는 코드
       fetchArticles();
-      setArticles({ subject: "", content: "" });
+      setArticle({ subject: "", content: "" });
     } else {
       alert("fail");
     }
