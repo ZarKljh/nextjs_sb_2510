@@ -17,4 +17,6 @@ public class ApiMemberController {
         return "member test";
     }
 
+
+
 }
