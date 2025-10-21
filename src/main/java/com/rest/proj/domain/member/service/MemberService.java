@@ -3,6 +3,7 @@ package com.rest.proj.domain.member.service;
 import com.rest.proj.domain.member.entity.Member;
 import com.rest.proj.domain.member.repository.MemberRepository;
 import com.rest.proj.global.jwt.JwtProvider;
+import com.rest.proj.global.rsData.RsData;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,11 +33,12 @@ public class MemberService {
         private String accessToken;
     }
 
-    public void authAndMakeTokens(@NotBlank String username, @NotBlank String password) {
+    public RsData<AuthAndMakeTokensResponseBody> authAndMakeTokens(@NotBlank String username, @NotBlank String password) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자가 존재하지 않습니다."));
         String accessToken = jwtProvider.genToken(member, 60 * 60 * 5);
         System.out.println("accessToken : " + accessToken);
+        return RsData.of("200-1", "로그인 성공", new AuthAndMakeTokensResponseBody(member, accessToken));
     }
 }
 

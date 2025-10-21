@@ -1,6 +1,6 @@
 package com.rest.proj.domain.member;
 
-import com.rest.proj.domain.member.entity.Member;
+import com.rest.proj.domain.member.dto.MemberDto;
 import com.rest.proj.domain.member.service.MemberService;
 import com.rest.proj.global.rsData.RsData;
 import jakarta.validation.Valid;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ApiMemberController {
     private final MemberService memberService;
-    //private final MemberDto memberDto;
+
 
     @GetMapping("/test")
     public String memberTest(){
@@ -33,13 +33,19 @@ public class ApiMemberController {
     @Getter
     @AllArgsConstructor
     public static class LoginResponseBody{
-        private Member member;
+        //private Member member;
+        private MemberDto memberDto;
     }
 
     @PostMapping("/login")
     public RsData<LoginResponseBody> login(@Valid @RequestBody LoginRequestBody loginRequestBody){
-        memberService.authAndMakeTokens(loginRequestBody.getUsername(),loginRequestBody.getPassword());
-        return RsData.of("OK", "OK");
+        //memberService.authAndMakeTokens(loginRequestBody.getUsername(),loginRequestBody.getPassword());
+        RsData<MemberService.AuthAndMakeTokensResponseBody> authAndMakeTokensRs = memberService.authAndMakeTokens(loginRequestBody.getUsername(), loginRequestBody.getPassword());
+        return RsData.of(
+                authAndMakeTokensRs.getResultCode(),
+                authAndMakeTokensRs.getMsg(),
+                new LoginResponseBody(new MemberDto(authAndMakeTokensRs.getData().getMember()))
+        );
 
     }
 
