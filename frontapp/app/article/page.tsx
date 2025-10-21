@@ -69,7 +69,7 @@ export default function Article() {
           {articles.map((article) => (
             <li key={article.id}>
               {article.id}/
-              <Link href={"/articles/${article.id}"}>{article.subject}</Link> /
+              <Link href={`/article/${article.id}`}>{article.subject}</Link> /
               {article.createdDate}
               <button onClick={() => handleDelete(article.id)}>삭제</button>
             </li>
