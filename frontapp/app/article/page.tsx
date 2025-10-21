@@ -39,6 +39,25 @@ export default function Article() {
       .catch((err) => console.error(err));
   };
 
+  const handleDelete = async (id) => {
+    //id 변수를 포함하려면 백틱`을 사용해야한다
+    const response = await fetch(
+      `http://localhost:8090/api/v1/articles/${id}`,
+      {
+        //method는 대문자로 쓰는 것이 관례이다
+        method: "DELETE",
+      }
+    );
+
+    if (response.ok) {
+      alert("delete complete");
+      //새로고침을 하는 코드
+      fetchArticles();
+    } else {
+      alert("fail");
+    }
+  };
+
   return (
     <>
       <ArticleForm fetchArticles={fetchArticles}></ArticleForm>
@@ -52,6 +71,7 @@ export default function Article() {
               {article.id}/
               <Link href={"/articles/${article.id}"}>{article.subject}</Link> /
               {article.createdDate}
+              <button onClick={() => handleDelete(article.id)}>삭제</button>
             </li>
           ))}
         </ul>
@@ -68,9 +88,11 @@ function ArticleForm({ fetchArticles }) {
 
     const response = await fetch("http://localhost:8090/api/v1/articles", {
       method: "POST",
+      //서버에게 주고받는 데이터를 json형태로 하겠다고 선언하는 것
       headers: {
         "Content-Type": "application/json",
       },
+      //무엇을 json으로 할지 선언한것
       body: JSON.stringify(article),
     });
 
