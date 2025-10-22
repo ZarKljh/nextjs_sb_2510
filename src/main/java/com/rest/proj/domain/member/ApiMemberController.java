@@ -3,11 +3,13 @@ package com.rest.proj.domain.member;
 import com.rest.proj.domain.member.dto.MemberDto;
 import com.rest.proj.domain.member.service.MemberService;
 import com.rest.proj.global.rsData.RsData;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,9 +40,19 @@ public class ApiMemberController {
     }
 
     @PostMapping("/login")
-    public RsData<LoginResponseBody> login(@Valid @RequestBody LoginRequestBody loginRequestBody){
+    public RsData<LoginResponseBody> login(@Valid @RequestBody LoginRequestBody loginRequestBody, HttpServletResponse resp){
         //memberService.authAndMakeTokens(loginRequestBody.getUsername(),loginRequestBody.getPassword());
         RsData<MemberService.AuthAndMakeTokensResponseBody> authAndMakeTokensRs = memberService.authAndMakeTokens(loginRequestBody.getUsername(), loginRequestBody.getPassword());
+
+        ResponseCookie cookie = ResponseCookie.from("accessToken", authAndMakeTokensRs.getData().getAccessToken())
+                .path("/")  //이 쿠키가 사용되어지는 경로들
+                .sameSite("None") // 이 쿠키가 다른 사이트에서도 사용되게 하겠느냐? --> 아니요 None을 설정하면, secure(true)로 꼭 설정해야한다.
+                .secure(true) //보안을 강화하겠는가? --> 예
+                .httpOnly(true) //http프로토콜을 사용하겠는가? --> 예
+                .build();
+
+        resp.addHeader("Set-Cookie", cookie.toString());
+
         return RsData.of(
                 authAndMakeTokensRs.getResultCode(),
                 authAndMakeTokensRs.getMsg(),
