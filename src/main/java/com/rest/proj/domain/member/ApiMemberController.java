@@ -43,7 +43,7 @@ public class ApiMemberController {
     public RsData<LoginResponseBody> login(@Valid @RequestBody LoginRequestBody loginRequestBody, HttpServletResponse resp){
         //memberService.authAndMakeTokens(loginRequestBody.getUsername(),loginRequestBody.getPassword());
         RsData<MemberService.AuthAndMakeTokensResponseBody> authAndMakeTokensRs = memberService.authAndMakeTokens(loginRequestBody.getUsername(), loginRequestBody.getPassword());
-
+        //access쿠키를 만드는 코드
         ResponseCookie cookie = ResponseCookie.from("accessToken", authAndMakeTokensRs.getData().getAccessToken())
                 .path("/")  //이 쿠키가 사용되어지는 경로들
                 .sameSite("None") // 이 쿠키가 다른 사이트에서도 사용되게 하겠느냐? --> 아니요 None을 설정하면, secure(true)로 꼭 설정해야한다.
@@ -59,6 +59,10 @@ public class ApiMemberController {
                 new LoginResponseBody(new MemberDto(authAndMakeTokensRs.getData().getMember()))
         );
 
+    }
+    @GetMapping("/me")
+    public String me(){
+        return "내정보";
     }
 
 }
