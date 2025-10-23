@@ -61,6 +61,14 @@ public class ApiMemberController {
     public String me(){
         return "내정보";
     }
+
+    @PostMapping("/logout")
+    public RsData<Void> logout(){
+        rq.removeCrossDomainCookie("accessToken");
+        rq.removeCrossDomainCookie("refreshToken");
+
+        return RsData.of("200","로그아웃 성공");
+    }
     /*
     private void _addHeaderCookie(String tokenName, String token){
         ResponseCookie cookie = ResponseCookie

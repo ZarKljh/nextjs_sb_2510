@@ -50,6 +50,23 @@ export default function Login() {
     //console.log({...article, [name]: value});
   };
 
+  //로그아웃을 위한 메소드
+  const handleLogout = async () => {
+    const response = await fetch(
+      "http://localhost:8090/api/v1/members/logout",
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+    if (response.ok) {
+      alert("logout success");
+      //router.push(`/article/${params.id}`);
+    } else {
+      alert("logout fail");
+    }
+  };
+
   return (
     <>
       <h4>로그인</h4>
@@ -61,6 +78,7 @@ export default function Login() {
           {/* <button type="submit">등록</button> */}
         </div>
       </form>
+      <button onClick={handleLogout}>로그아웃</button>
     </>
   );
 }

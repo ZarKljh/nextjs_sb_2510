@@ -27,6 +27,7 @@ public class ApiSecurityConfig {
                                 .requestMatchers("/api/*/articles").permitAll()
                                 .requestMatchers("/api/*/articles/*").permitAll()
                                 .requestMatchers(HttpMethod.POST, "/api/*/members/login").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/api/*/members/logout").permitAll()
                                 .anyRequest().authenticated()
                 )
                 /*restAPI에서는 jwt방식을 사용하기 때문에 csrf 기능을 꺼놓는다*/
