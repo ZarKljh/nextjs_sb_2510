@@ -1,25 +1,22 @@
 package com.rest.proj.global.security;
 
 import com.rest.proj.domain.member.service.MemberService;
+import com.rest.proj.global.rq.Rq;
 import com.rest.proj.global.rsData.RsData;
 import jakarta.servlet.FilterChain;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-
-import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
-    private final HttpServletRequest req;
-    private final HttpServletResponse resp;
+    //private final HttpServletRequest req;
+    //private final HttpServletResponse resp;
+    private final Rq rq;
     private final MemberService memberService;
 
     @Override
@@ -30,16 +27,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             return;
         }
 
-        String accessToken = _getCookie("accessToken");
+        String accessToken = rq.getCookie("accessToken");
+
 
 
         // accessToken 검증 or refreshToken 발급
         if (!accessToken.isBlank()) {
             if(!memberService.validateToken(accessToken)){
-                String refreshToken = _getCookie("refreshToken");
+                String refreshToken = rq.getCookie("refreshToken");
                 RsData<String> rs = memberService.refreshAccessToken(refreshToken);
 
-                _addHeaderCookie("accessToken", rs.getData());
+                //_addHeaderCookie("accessToken", rs.getData());
+                rq.setCrossDomainCookie("accessToken", rs.getData());
             }
             // SecurityUser 가져오기
             // Security 시스템에서 기본적으로 제공하는 클래스이다
@@ -47,14 +46,18 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
 
             //인가처리
-            SecurityContextHolder.getContext().setAuthentication(securityUser.getAuthentication());
+            //SecurityContextHolder.getContext().setAuthentication(securityUser.getAuthentication());
 
+            //로그인처리
+            rq.setLogin(securityUser);
         }
 
         filterChain.doFilter(request, response);
     }
+
     /*현재 시스템 내에서 있는 모든 쿠키를 가져오는 코드*/
     /*name 은 이 토큰의 종류를 말한다. access토큰인지, refresh토큰인지 구분한다*/
+    /*
     private String _getCookie(String name){
         Cookie[] cookies = req.getCookies();
 
@@ -76,4 +79,5 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
         resp.addHeader("Set-Cookie", cookie.toString());
     }
+    */
 }

@@ -2,6 +2,7 @@ package com.rest.proj.domain.member;
 
 import com.rest.proj.domain.member.dto.MemberDto;
 import com.rest.proj.domain.member.service.MemberService;
+import com.rest.proj.global.rq.Rq;
 import com.rest.proj.global.rsData.RsData;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -9,7 +10,6 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +17,8 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ApiMemberController {
     private final MemberService memberService;
-    private final HttpServletResponse resp;
+    //private final HttpServletResponse resp;
+    private final Rq rq;
 
     @GetMapping("/test")
     public String memberTest(){
@@ -45,8 +46,8 @@ public class ApiMemberController {
         RsData<MemberService.AuthAndMakeTokensResponseBody> authAndMakeTokensRs = memberService.authAndMakeTokens(loginRequestBody.getUsername(), loginRequestBody.getPassword());
         //access쿠키를 만드는 코드
 
-        _addHeaderCookie("accessToken", authAndMakeTokensRs.getData().getAccessToken());
-        _addHeaderCookie("refreshToken", authAndMakeTokensRs.getData().getRefreshToken());
+        rq.setCrossDomainCookie("accessToken", authAndMakeTokensRs.getData().getAccessToken());
+        rq.setCrossDomainCookie("refreshToken", authAndMakeTokensRs.getData().getRefreshToken());
 
 
         return RsData.of(
@@ -60,7 +61,7 @@ public class ApiMemberController {
     public String me(){
         return "내정보";
     }
-
+    /*
     private void _addHeaderCookie(String tokenName, String token){
         ResponseCookie cookie = ResponseCookie
                 //.from("accessToken", authAndMakeTokensRs.getData().getAccessToken())
@@ -73,5 +74,5 @@ public class ApiMemberController {
 
         resp.addHeader("Set-Cookie", cookie.toString());
     }
-
+    */
 }
