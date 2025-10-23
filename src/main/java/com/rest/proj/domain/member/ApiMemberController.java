@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ApiMemberController {
     private final MemberService memberService;
-
+    private final HttpServletResponse resp;
 
     @GetMapping("/test")
     public String memberTest(){
@@ -44,14 +44,10 @@ public class ApiMemberController {
         //memberService.authAndMakeTokens(loginRequestBody.getUsername(),loginRequestBody.getPassword());
         RsData<MemberService.AuthAndMakeTokensResponseBody> authAndMakeTokensRs = memberService.authAndMakeTokens(loginRequestBody.getUsername(), loginRequestBody.getPassword());
         //access쿠키를 만드는 코드
-        ResponseCookie cookie = ResponseCookie.from("accessToken", authAndMakeTokensRs.getData().getAccessToken())
-                .path("/")  //이 쿠키가 사용되어지는 경로들
-                .sameSite("None") // 이 쿠키가 다른 사이트에서도 사용되게 하겠느냐? --> 아니요 None을 설정하면, secure(true)로 꼭 설정해야한다.
-                .secure(true) //보안을 강화하겠는가? --> 예
-                .httpOnly(true) //http프로토콜을 사용하겠는가? --> 예
-                .build();
 
-        resp.addHeader("Set-Cookie", cookie.toString());
+        _addHeaderCookie("accessToken", authAndMakeTokensRs.getData().getAccessToken());
+        _addHeaderCookie("refreshToken", authAndMakeTokensRs.getData().getRefreshToken());
+
 
         return RsData.of(
                 authAndMakeTokensRs.getResultCode(),
@@ -63,6 +59,19 @@ public class ApiMemberController {
     @GetMapping("/me")
     public String me(){
         return "내정보";
+    }
+
+    private void _addHeaderCookie(String tokenName, String token){
+        ResponseCookie cookie = ResponseCookie
+                //.from("accessToken", authAndMakeTokensRs.getData().getAccessToken())
+                .from(tokenName, token)
+                .path("/")  //이 쿠키가 사용되어지는 경로들
+                .sameSite("None") // 이 쿠키가 다른 사이트에서도 사용되게 하겠느냐? --> 아니요 None을 설정하면, secure(true)로 꼭 설정해야한다.
+                .secure(true) //보안을 강화하겠는가? --> 예
+                .httpOnly(true) //http프로토콜을 사용하겠는가? --> 예
+                .build();
+
+        resp.addHeader("Set-Cookie", cookie.toString());
     }
 
 }

@@ -28,6 +28,9 @@ public class MemberService {
                 .password(password)
                 .email(email)
                 .build();
+        String refreshToken = jwtProvider.genRefreshToken(member);
+        member.setRefreshToken(refreshToken);
+
         memberRepository.save(member);
         return member;
     }
@@ -41,19 +44,31 @@ public class MemberService {
         return new SecurityUser(id, username, "", authorities);
     }
 
+    public boolean validateToken(String token) {
+        return jwtProvider.verify(token);
+    }
+
+    public RsData<String> refreshAccessToken(String refreshToken) {
+        Member member = memberRepository.findByRefreshToken(refreshToken).orElseThrow(() -> new RuntimeException("존재하지 않는 리프레시 토큰입니다"));
+        String accessToken = jwtProvider.genAccessToken(member);
+        return RsData.of("200-1","토큰 갱신 성공", accessToken);
+    }
+
     @AllArgsConstructor
     @Getter
     public static class AuthAndMakeTokensResponseBody{
         private Member member;
         private String accessToken;
+        private String refreshToken;
     }
 
     public RsData<AuthAndMakeTokensResponseBody> authAndMakeTokens(@NotBlank String username, @NotBlank String password) {
         Member member = memberRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자가 존재하지 않습니다."));
-        String accessToken = jwtProvider.genToken(member, 60 * 60 * 5);
+        String accessToken = jwtProvider.genAccessToken(member);
+        String refreshToken = jwtProvider.genRefreshToken(member);
         System.out.println("accessToken : " + accessToken);
-        return RsData.of("200-1", "로그인 성공", new AuthAndMakeTokensResponseBody(member, accessToken));
+        return RsData.of("200-1", "로그인 성공", new AuthAndMakeTokensResponseBody(member, accessToken, refreshToken));
     }
 }
 
