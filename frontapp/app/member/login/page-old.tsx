@@ -1,6 +1,4 @@
 "use client";
-
-import api from "@/app/utils/api";
 import { useState, useEffect } from "react";
 
 export default function Login() {
@@ -24,7 +22,24 @@ export default function Login() {
     */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await api.post("/members/login", user);
+
+    const response = await fetch(`http://localhost:8090/api/v1/members/login`, {
+      method: "POST",
+      credentials: "include", //인증정보를 함께 보내는 경우, 쿠키와 같은 것들포함
+      //서버에게 주고받는 데이터를 json형태로 하겠다고 선언하는 것
+      headers: {
+        "Content-Type": "application/json",
+      },
+      //무엇을 json으로 할지 선언한것
+      body: JSON.stringify(user),
+    });
+
+    if (response.ok) {
+      alert("login success");
+      //router.push(`/article/${params.id}`);
+    } else {
+      alert("login fail");
+    }
   };
 
   //입력창에 값을 입력할 때마다 동작한다.
@@ -37,7 +52,19 @@ export default function Login() {
 
   //로그아웃을 위한 메소드
   const handleLogout = async () => {
-    await api.post("/members/logout");
+    const response = await fetch(
+      "http://localhost:8090/api/v1/members/logout",
+      {
+        method: "POST",
+        credentials: "include",
+      }
+    );
+    if (response.ok) {
+      alert("logout success");
+      //router.push(`/article/${params.id}`);
+    } else {
+      alert("logout fail");
+    }
   };
 
   return (

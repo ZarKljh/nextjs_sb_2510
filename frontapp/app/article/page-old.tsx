@@ -7,7 +7,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import api from "@/app/utils/api";
 
 export default function Article() {
   const [articles, setArticles] = useState([]);
@@ -34,15 +33,29 @@ export default function Article() {
   };
   */
   const fetchArticles = async () => {
-    api
-      .get("/articles")
-      .then((response) => setArticles(response.data.data.articles))
-      .catch((err) => console.log(err));
+    await fetch("http://localhost:8090/api/v1/articles")
+      .then((result) => result.json())
+      .then((result) => setArticles(result.data.articles))
+      .catch((err) => console.error(err));
   };
 
   const handleDelete = async (id) => {
     //id 변수를 포함하려면 백틱`을 사용해야한다
-    await api.delete(`/articles/${id}`).then(() => fetchArticles());
+    const response = await fetch(
+      `http://localhost:8090/api/v1/articles/${id}`,
+      {
+        //method는 대문자로 쓰는 것이 관례이다
+        method: "DELETE",
+      }
+    );
+
+    if (response.ok) {
+      alert("delete complete");
+      //새로고침을 하는 코드
+      fetchArticles();
+    } else {
+      alert("fail");
+    }
   };
 
   return (
@@ -73,16 +86,24 @@ function ArticleForm({ fetchArticles }) {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await api
-      .post("/articles", article)
-      .then(function (res) {
-        alert("success");
-        fetchArticles();
-        setArticle({ subject: "", content: "" });
-      })
-      .catch(function (err) {
-        alert("fail");
-      });
+    const response = await fetch("http://localhost:8090/api/v1/articles", {
+      method: "POST",
+      //서버에게 주고받는 데이터를 json형태로 하겠다고 선언하는 것
+      headers: {
+        "Content-Type": "application/json",
+      },
+      //무엇을 json으로 할지 선언한것
+      body: JSON.stringify(article),
+    });
+
+    if (response.ok) {
+      alert("success");
+      //새로고침을 하는 코드
+      fetchArticles();
+      setArticle({ subject: "", content: "" });
+    } else {
+      alert("fail");
+    }
   };
 
   //입력창에 값을 입력할 때마다 동작한다.

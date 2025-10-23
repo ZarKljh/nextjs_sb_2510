@@ -1,6 +1,5 @@
 "use client";
 
-import api from "@/app/utils/api";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -17,24 +16,34 @@ export default function ArticleEdit() {
 
   //useEffect에 의해 랜더링 되는 메소드이다
   const fetchArticle = async () => {
-    api
-      .get(`/articles/${params.id}`)
-      .then((response) => setArticle(response.data.data.article))
-      .catch((err) => console.log(err));
+    await fetch(`http://localhost:8090/api/v1/articles/${params.id}`)
+      .then((result) => result.json())
+      .then((result) => setArticle(result.data.article))
+      .catch((err) => console.error(err));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    await api
-      .patch(`/articles/${params.id}`, article)
-      .then(function (res) {
-        alert("seccess");.
-        router.push(`/article/${params.id}`);
-      })
-      .catch(function (err) {
-        alert("fail");
-      });
+    const response = await fetch(
+      `http://localhost:8090/api/v1/articles/${params.id}`,
+      {
+        method: "PATCH",
+        //서버에게 주고받는 데이터를 json형태로 하겠다고 선언하는 것
+        headers: {
+          "Content-Type": "application/json",
+        },
+        //무엇을 json으로 할지 선언한것
+        body: JSON.stringify(article),
+      }
+    );
+
+    if (response.ok) {
+      alert("update success");
+      router.push(`/article/${params.id}`);
+    } else {
+      alert("udate fail");
+    }
   };
 
   //입력창에 값을 입력할 때마다 동작한다.
