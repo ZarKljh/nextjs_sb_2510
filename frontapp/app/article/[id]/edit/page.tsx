@@ -8,10 +8,19 @@ export default function ArticleEdit() {
   const params = useParams();
   const router = useRouter();
   const [article, setArticle] = useState({ subject: "", content: "" });
+  const [isLoading, setIsLoading] = useState(false);
 
   //userEffect 는 페이지가 실행될때 맨처음 랜더링을 한다는 뜻
   // 마지막 [] 는 1번만 실행한다는 뜻이다.
+  
   useEffect(() => {
+    api
+    fetchArticle();
+  }, []);
+
+  //useEffect에 의해 랜더링 되는 메소드이다
+  const fetchArticle = async () => {
+
     api
       .get("/members/me")
       .then((res) => console.log(res))
@@ -20,14 +29,12 @@ export default function ArticleEdit() {
         alert("로그인 후 이용해주세요");
         router.push("/member/login");
       });
-    fetchArticle();
-  }, []);
 
-  //useEffect에 의해 랜더링 되는 메소드이다
-  const fetchArticle = async () => {
-    api
+    await api
       .get(`/articles/${params.id}`)
-      .then((response) => setArticle(response.data.data.article))
+      .then((response) => {setArticle(response.data.data.article); 
+                           setIsLoading(true);}
+                          )
       .catch((err) => console.log(err));
   };
 
@@ -54,31 +61,37 @@ export default function ArticleEdit() {
   };
 
   return (
-    <>
-      <h4>게시물 수정</h4>
-      <form onSubmit={handleSubmit}>
-        <label>
-          제목:
-          <input
-            type="text"
-            name="subject"
-            onChange={handleChange}
-            value={article.subject}
-          />
-        </label>
-        <br></br>
-        <label>
-          내용:
-          <input
-            type="text"
-            name="content"
-            onChange={handleChange}
-            value={article.content}
-          />
-        </label>
-        <input type="submit" value="수정"></input>
-        {/* <button type="submit">등록</button> */}
-      </form>
-    </>
+      <>
+        {isLoading ? (
+          <>
+            <h4>게시물 수정</h4>
+            <form onSubmit={handleSubmit}>
+              <label>
+                제목:
+                <input
+                  type="text"
+                  name="subject"
+                  onChange={handleChange}
+                  value={article.subject}
+                />
+              </label>
+              <br></br>
+              <label>
+                내용:
+                <input
+                  type="text"
+                  name="content"
+                  onChange={handleChange}
+                  value={article.content}
+                />
+              </label>
+              <input type="submit" value="수정"></input>
+              {/* <button type="submit">등록</button> */}
+            </form>
+          </>
+    ) : (
+          <></>
+    )}
+      </>
   );
 }
