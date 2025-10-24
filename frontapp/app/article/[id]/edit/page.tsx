@@ -12,6 +12,14 @@ export default function ArticleEdit() {
   //userEffect 는 페이지가 실행될때 맨처음 랜더링을 한다는 뜻
   // 마지막 [] 는 1번만 실행한다는 뜻이다.
   useEffect(() => {
+    api
+      .get("/members/me")
+      .then((res) => console.log(res))
+      .catch((err) => {
+        console.log(err);
+        alert("로그인 후 이용해주세요");
+        router.push("/member/login");
+      });
     fetchArticle();
   }, []);
 

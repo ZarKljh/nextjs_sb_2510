@@ -24,7 +24,11 @@ export default function Login() {
     */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await api.post("/members/login", user);
+    //await api.post("/members/login", user);
+    await api
+      .post("/members/login", user)
+      .then(() => alert("success"))
+      .catch((err) => console.log(err));
   };
 
   //입력창에 값을 입력할 때마다 동작한다.
