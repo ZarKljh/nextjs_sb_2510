@@ -1,10 +1,12 @@
 "use client";
 
 import api from "@/app/utils/api";
+import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
 export default function Login() {
   const [user, setUser] = useState({ username: "", password: "" });
+  const router = useRouter();
 
   //userEffect 는 페이지가 실행될때 맨처음 랜더링을 한다는 뜻
   // 마지막 [] 는 1번만 실행한다는 뜻이다.
@@ -27,7 +29,12 @@ export default function Login() {
     //await api.post("/members/login", user);
     await api
       .post("/members/login", user)
-      .then(() => alert("success"))
+      //.then(() => alert("success"))
+      .then(() => {
+        alert("로그인 되었습니다");
+        // router.push("/");
+        router.back();
+      })
       .catch((err) => console.log(err));
   };
 
@@ -41,7 +48,14 @@ export default function Login() {
 
   //로그아웃을 위한 메소드
   const handleLogout = async () => {
-    await api.post("/members/logout");
+    //await api.post("/members/logout");
+    await api
+      .post("/members/logout")
+      .then(() => {
+        alert("로그아웃 되었습니다");
+        router.push("/");
+      })
+      .catch((err) => console.log(err));
   };
 
   return (

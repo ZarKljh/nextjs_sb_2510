@@ -25,11 +25,6 @@ public class ApiV1ArticleController {
     private final ArticleService articleService;
     private final Rq rq;
 
-    @Getter
-    @AllArgsConstructor
-    public static class ArticlesResponse{
-        private final List<ArticleDto> articles;
-    }
 
 
     @GetMapping
@@ -44,11 +39,6 @@ public class ApiV1ArticleController {
         return RsData.of("S-1", "성공", new ArticlesResponse(articles));
     }
 
-    @Getter
-    @AllArgsConstructor
-    public static class ArticleResponse{
-        private final ArticleDto article;
-    }
 
     @GetMapping("/{id}")
     public RsData<ArticleResponse> getArticle(@PathVariable("id") Long id){
@@ -62,19 +52,6 @@ public class ApiV1ArticleController {
                 "%d번 게시물은 존재하지 않습니다.".formatted(id),
                 null));
     }
-    @Data
-    public static class WriteRequest{
-        @NotBlank
-        private String subject;
-        @NotBlank
-        private String content;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class WriteResponse{
-        private final Article article;
-    }
 
     @PostMapping
     public RsData<WriteResponse> write(@Valid @RequestBody WriteRequest writeRequest){
@@ -87,21 +64,6 @@ public class ApiV1ArticleController {
                 writeRs.getMsg(),
                 new WriteResponse(new ArticleDto(writeRs.getData()))
         );
-    }
-
-    @Data
-    public static class ModifyRequest {
-        @NotBlank
-        private String subject;
-
-        @NotBlank
-        private String content;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class ModifyResponse {
-        private final Article article;
     }
 
     @PatchMapping("/{id}")
@@ -125,21 +87,6 @@ public class ApiV1ArticleController {
 
     }
 
-    @Data
-    public static class DeleteRequest {
-        @NotBlank
-        private String subject;
-
-        @NotBlank
-        private String content;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    public static class DeleteResponse {
-        private final Article article;
-    }
-
     @DeleteMapping("/{id}")
     public RsData delete(@PathVariable("id") Long id){
         Optional<Article> opArticle = articleService.findById(id);
@@ -157,4 +104,65 @@ public class ApiV1ArticleController {
                 new DeleteResponse(deleteRs.getData())
         );
     }
+
+
+
+    @Getter
+    @AllArgsConstructor
+    public static class ArticleResponse{
+        private final ArticleDto article;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class ArticlesResponse{
+        private final List<ArticleDto> articles;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class WriteResponse{
+        private final ArticleDto article;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class ModifyResponse {
+        private final Article article;
+    }
+
+    @Getter
+    @AllArgsConstructor
+    public static class DeleteResponse {
+        private final Article article;
+    }
+
+    @Data
+    public static class WriteRequest{
+        @NotBlank
+        private String subject;
+        @NotBlank
+        private String content;
+    }
+
+    @Data
+    public static class ModifyRequest {
+        @NotBlank
+        private String subject;
+
+        @NotBlank
+        private String content;
+    }
+
+    @Data
+    public static class DeleteRequest {
+        @NotBlank
+        private String subject;
+
+        @NotBlank
+        private String content;
+    }
+
+
+
 }
