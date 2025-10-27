@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import ReactQueryProviders from "@/src/utils/ReactQueryProviders";
 //import { Geist, Geist_Mono } from "next/font/google";
 //import "./globals.css";
 /*
@@ -32,7 +33,7 @@ export default function RootLayout({
           <Link href="/article">게시판</Link>
           <Link href="/member/login">로그인</Link>
         </nav>
-        {children}
+        <ReactQueryProviders>{children}</ReactQueryProviders>
       </body>
     </html>
   );
